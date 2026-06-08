@@ -1,43 +1,1230 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dealer Login</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Dealer Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 class="text-2xl font-bold text-center mb-6 text-indigo-600">Dealer Portal Login</h2>
-        <form onsubmit="handleLogin(event)">
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">User Name</label>
-                <input type="text" id="loginUser" required class="w-full border p-2 rounded">
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div id="auth-container" class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div id="login-card" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+            <div class="text-center mb-8">
+                <i class="fa-solid fa-store text-blue-600 text-4xl mb-2"></i>
+                <h2 class="text-2xl font-bold text-gray-900">Dealer Portal Login</h2>
+                <p class="text-gray-500 text-sm">Sign in with your signup credentials</p>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Password</label>
-                <input type="password" id="loginPass" required class="w-full border p-2 rounded">
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Username</label>
+                    <input type="text" id="login-username" required class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Enter username">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
+                </div>
+                <div class="text-right text-sm">
+                    <button type="button" onclick="switchAuth('forgot')" class="text-blue-600 hover:underline">Forgot Password?</button>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Sign In</button>
+            </form>
+            <p class="text-center text-sm text-gray-600 mt-6">New Dealer? <button onclick="switchAuth('signup')" class="text-blue-600 font-semibold hover:underline">Create Account / Sign Up</button></p>
+        </div>
+
+        <div id="signup-card" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-gray-100 hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Dealer Account Registration</h2>
+                <p class="text-gray-500 text-sm">Set up your portal identity</p>
             </div>
-            <div class="flex justify-between items-center mb-6 text-sm">
-                <a href="forgot-password.html" class="text-indigo-600 hover:underline">Forgot Password?</a>
-                <a href="signup.html" class="text-gray-600 hover:underline">Create Account</a>
+            <form onsubmit="handleSignup(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Username *</label>
+                        <input type="text" id="reg-username" required class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Password *</label>
+                        <input type="password" id="reg-password" required class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Business Name *</label>
+                        <input type="text" id="reg-bizname" required class="w-full px-4 py-2 border rounded-lg" placeholder="e.g. Traders Corp">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Phone Number *</label>
+                        <input type="tel" id="reg-phone" required class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Shop Address * <span class="text-red-500">(Mandatory)</span></label>
+                    <textarea id="reg-address" required class="w-full px-4 py-2 border rounded-lg h-20" placeholder="Full shop location..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Business Logo Photo</label>
+                    <input type="file" id="reg-logo" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Complete Sign Up</button>
+            </form>
+            <p class="text-center text-sm text-gray-600 mt-4">Already registered? <button onclick="switchAuth('login')" class="text-blue-600 font-semibold hover:underline">Log In</button></p>
+        </div>
+
+        <div id="forgot-card" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Reset Password</h2>
+                <p class="text-gray-500 text-sm">Recover your portal access credentials</p>
             </div>
-            <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded font-bold hover:bg-indigo-700">Login</button>
-        </form>
+            <form onsubmit="handleForgotPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Enter your Registered Username</label>
+                    <input type="text" id="forgot-username" required class="w-full px-4 py-2 border rounded-lg" placeholder="Your username">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">Show Password</button>
+                <button type="button" onclick="switchAuth('login')" class="w-full bg-gray-100 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition">Back to Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-dashboard" class="min-h-screen flex flex-col md:flex-row hidden">
+        
+        <aside class="w-full md:w-64 bg-gray-900 text-white flex flex-col shrink-0">
+            <div class="p-6 border-b border-gray-800 text-center">
+                <div class="w-20 h-20 mx-auto mb-3">
+                    <img id="sidebar-logo" src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&w=100&h=100&q=80" class="w-full h-full object-cover rounded-full border-2 border-blue-500" alt="Logo">
+                </div>
+                <h3 id="sidebar-name" class="font-bold text-lg tracking-wide truncate">Loading Business...</h3>
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-medium">Dealer Active</span>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-1">
+                <button id="btn-inventory-tab" onclick="switchTab('inventory-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium bg-blue-600 text-white">
+                    <i class="fa-solid fa-boxes-stacked w-5"></i> <span>Inventory System</span>
+                </button>
+                <button id="btn-order-tab" onclick="switchTab('order-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i class="fa-solid fa-cart-plus w-5"></i> <span>Product Order</span>
+                </button>
+                <button id="btn-do-tab" onclick="switchTab('do-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i class="fa-solid fa-clipboard-list w-5"></i> <span>Product DO Book</span>
+                </button>
+                <button id="btn-accounts-tab" onclick="switchTab('accounts-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i class="fa-solid fa-scale-balanced w-5"></i> <span>Accounting Ledger</span>
+                </button>
+                <button id="btn-invoice-list-tab" onclick="switchTab('invoice-list-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i class="fa-solid fa-list-ol w-5"></i> <span>Invoices Archive</span>
+                </button>
+                <button id="btn-settings-tab" onclick="switchTab('settings-tab')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i class="fa-solid fa-gears w-5"></i> <span>Account Settings</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-gray-800">
+                <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition font-medium">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Logout Portal</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0">
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shrink-0">
+                <div class="flex items-center space-x-2 text-gray-500 font-medium">
+                    <i class="fa-solid fa-calendar-days text-blue-600"></i>
+                    <span id="live-date-time">Loading system clock...</span>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-8">
+                
+                <div id="inventory-tab" class="tab-content space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Inventory Management</h2>
+                            <p class="text-gray-500 text-sm">স্টক লিস্ট ট্র্যাক, এডিট, ডিলিট এবং প্রিন্ট করুন</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="downloadInventoryCSV()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition"><i class="fa-solid fa-file-csv mr-1"></i> Download List</button>
+                            <button onclick="printSection('inventory-table-container')" class="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition"><i class="fa-solid fa-print mr-1"></i> Print List</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 border rounded-xl shadow-sm">
+                        <h3 id="form-title" class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-blue-600"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
+                        <form onsubmit="saveProduct(event)" id="product-form" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <input type="hidden" id="edit-index">
+                            <input type="text" id="inv-sku" required placeholder="Product SKU *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="text" id="inv-comp" required placeholder="Company Name *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="text" id="inv-name" required placeholder="Product Name *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="number" id="inv-qty" required placeholder="Qty (Kg/gm/PCs) *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="number" step="0.01" id="inv-dp" required placeholder="Dealer Price *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="number" step="0.01" id="inv-tp" required placeholder="TP Price *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="number" step="0.01" id="inv-mrp" required placeholder="MRP *" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="text" id="inv-offer" placeholder="Offer Details" class="border px-3 py-2 rounded-lg text-sm">
+                            <input type="text" id="inv-gift" placeholder="Gift Item" class="border px-3 py-2 rounded-lg text-sm">
+                            <div class="sm:col-span-2 md:col-span-4 flex gap-2">
+                                <button type="submit" id="btn-form-submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Add To Inventory Stock</button>
+                                <button type="button" id="btn-cancel-edit" onclick="resetInventoryForm()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="inventory-table-container" class="bg-white border rounded-xl shadow-sm overflow-hidden p-2">
+                        <h2 class="text-center font-bold text-lg p-2 print-header hidden">Inventory Stock List Report</h2>
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 border-b text-xs font-semibold uppercase text-gray-500">
+                                <tr>
+                                    <th class="p-3">SKU</th>
+                                    <th class="p-3">Company</th>
+                                    <th class="p-3">Product Name</th>
+                                    <th class="p-3">Stock</th>
+                                    <th class="p-3">Dealer Price</th>
+                                    <th class="p-3">TP</th>
+                                    <th class="p-3">MRP</th>
+                                    <th class="p-3">Offer/Gift</th>
+                                    <th class="p-3 text-center no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="order-tab" class="tab-content space-y-6 hidden">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Create Product Order</h2>
+                        <p class="text-gray-500 text-sm">একটি ইনভয়েসে একাধিক প্রোডাক্ট অর্ডার করুন এবং স্টক স্বয়ংক্রিয়ভাবে ম্যানেজ করুন</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 border rounded-xl shadow-sm lg:col-span-1 space-y-4 h-fit">
+                            <h3 class="font-bold text-gray-900 border-b pb-2">Client & Date Setup</h3>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Shop Name</label>
+                                <input type="text" id="order-shop-name" class="w-full border px-3 py-2 rounded-lg text-sm" value="M/S Rahman Store">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Address</label>
+                                <input type="text" id="order-shop-address" class="w-full border px-3 py-2 rounded-lg text-sm" value="Dhaka, Bangladesh">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Date</label>
+                                <input type="date" id="order-date" class="w-full border px-3 py-2 rounded-lg text-sm">
+                            </div>
+
+                            <h3 class="font-bold text-gray-900 border-b pb-2 pt-2">Add Product Details</h3>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Choose Item</label>
+                                <select id="order-product-select" class="w-full border px-3 py-2 rounded-lg text-sm bg-gray-50"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Required Quantity</label>
+                                <input type="number" id="order-qty" value="1" min="1" class="w-full border px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 text-gray-500">Cash Received This Order (৳)</label>
+                                <input type="number" id="order-cash-received" value="0" min="0" class="w-full border px-3 py-2 rounded-lg text-sm bg-green-50 font-bold">
+                            </div>
+                            
+                            <div class="flex flex-col gap-2 pt-2">
+                                <button onclick="addItemToCurrentOrder()" class="w-full bg-gray-800 text-white py-2 rounded-lg text-sm font-semibold hover:bg-gray-900 transition">
+                                    <i class="fa-solid fa-plus mr-1"></i> + Add Item to Order
+                                </button>
+                                <button onclick="processOrderCheckout()" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100">
+                                    Generate Invoice
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-8 border rounded-xl shadow-md lg:col-span-2 space-y-6">
+                            <div id="current-cart-section" class="border-b pb-4">
+                                <h3 class="font-bold text-gray-900 mb-2 text-sm flex items-center gap-1 text-orange-600"><i class="fa-solid fa-basket-shopping"></i> কার্টে থাকা আইটেমসমূহ (অর্ডার লিস্ট):</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase font-bold">
+                                            <tr>
+                                                <th class="p-2">Item</th>
+                                                <th class="p-2 text-center">Qty</th>
+                                                <th class="p-2 text-right">TP</th>
+                                                <th class="p-2 text-right">Total</th>
+                                                <th class="p-2 text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cart-table-body" class="divide-y">
+                                            <tr><td colspan="5" class="p-3 text-center text-gray-400">কোনো আইটেম যোগ করা হয়নি। বামদিকের বাটন থেকে এড করুন।</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="invoice-bill-container" class="p-2 border rounded-xl">
+                                <div id="invoice-print-area" class="space-y-6 bg-white p-4">
+                                    <div class="flex justify-between items-start border-b pb-6">
+                                        <div>
+                                            <img id="inv-preview-logo" src="" class="w-16 h-16 object-cover rounded-lg mb-2 hidden" alt="Logo">
+                                            <h2 id="inv-preview-bizname" class="text-2xl font-bold text-gray-900">Your Business Name</h2>
+                                            <p id="inv-preview-address" class="text-sm text-gray-500 max-w-xs">Address Line</p>
+                                            <p id="inv-preview-phone" class="text-sm text-gray-500">Phone</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded text-xs uppercase tracking-wide">Retail Invoice</span>
+                                            <p class="text-sm mt-3 font-semibold text-gray-700" id="inv-preview-id">Invoice No: #INV-0000</p>
+                                            <p class="text-xs text-gray-400" id="inv-preview-date">Date: --/--/----</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Billed & Shipped To</h4>
+                                            <p class="font-bold text-gray-800" id="inv-preview-target-shop">Shop Name</p>
+                                            <p class="text-sm text-gray-500" id="inv-preview-target-address">Address</p>
+                                        </div>
+                                    </div>
+
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-gray-50 border-b text-xs font-bold text-gray-500 uppercase">
+                                            <tr>
+                                                <th class="p-3">SKU / Item Details</th>
+                                                <th class="p-3 text-center">Qty</th>
+                                                <th class="p-3 text-right">TP Rate</th>
+                                                <th class="p-3 text-right">MRP</th>
+                                                <th class="p-3 text-right">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inv-items-body" class="divide-y text-sm text-gray-700">
+                                            <tr><td colspan="5" class="p-3 text-center text-gray-400">No active invoice generated yet.</td></tr>
+                                        </tbody>
+                                        <tfoot class="bg-gray-50 text-xs font-semibold text-gray-700">
+                                            <tr>
+                                                <td colspan="4" class="p-2 text-right">Total Invoice Value:</td>
+                                                <td id="inv-subtotal-val" class="p-2 text-right text-sm">৳0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" class="p-2 text-right text-green-600">Cash Received Amount:</td>
+                                                <td id="inv-received-val" class="p-2 text-right text-sm text-green-600">৳0.00</td>
+                                            </tr>
+                                            <tr class="font-bold text-gray-900 border-t">
+                                                <td colspan="4" class="p-3 text-right text-sm uppercase">Total Outstanding Due:</td>
+                                                <td id="inv-total-amount" class="p-3 text-right text-base text-red-600">৳0.00</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4 border-t">
+                                <button onclick="triggerInvoiceDownload()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200"><i class="fa-solid fa-download mr-1"></i> Download Invoice</button>
+                                <button onclick="printSection('invoice-bill-container')" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"><i class="fa-solid fa-print mr-1"></i> Print Invoice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="do-tab" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Product DO (Delivery Order) Register</h2>
+                            <p class="text-gray-500 text-sm">কোম্পানি থেকে ডিলারের নতুন প্রোডাক্ট অর্ডারের রেকর্ড সেভ করুন</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="downloadDOCSV()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700"><i class="fa-solid fa-file-csv mr-1"></i> Download DO Book</button>
+                            <button onclick="printSection('do-report-container')" class="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800"><i class="fa-solid fa-print mr-1"></i> Print DO Log</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 border rounded-xl shadow-sm">
+                        <form onsubmit="saveDOEntry(event)" id="do-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Product Name</label>
+                                <input type="text" id="do-pname" required class="w-full border px-3 py-2 rounded-lg text-sm" placeholder="e.g. Miniket Rice">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Unit Weight/Size</label>
+                                <input type="text" id="do-punit" required class="w-full border px-3 py-2 rounded-lg text-sm" placeholder="Kg / Gm / Pcs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Total Ordered Qty</label>
+                                <input type="number" id="do-pqty" required class="w-full border px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Total Amount (৳)</label>
+                                <input type="number" step="0.01" id="do-pamount" required class="w-full border px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <button type="submit" class="sm:col-span-4 bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Save DO Entry Book Record</button>
+                        </form>
+                    </div>
+
+                    <div id="do-report-container" class="bg-white border rounded-xl shadow-sm overflow-hidden p-4">
+                        <h3 class="text-center font-bold text-lg p-2 print-header hidden">Product Delivery Order (DO) Statement</h3>
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 border-b text-xs font-semibold uppercase text-gray-500">
+                                <tr>
+                                    <th class="p-3">Date Stamp</th>
+                                    <th class="p-3">Product Name</th>
+                                    <th class="p-3">Unit</th>
+                                    <th class="p-3 text-center">DO Quantity</th>
+                                    <th class="p-3 text-right">Total Order Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody id="do-table-body" class="divide-y text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="accounts-tab" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Advanced Accounting Dashboard</h2>
+                            <p class="text-gray-500 text-sm">মূলধন, ব্যাংক ট্রানজেকশন, রিটার্ন সমন্বয় এবং নিখুঁত খরচ ম্যানেজমেন্ট মডিউল</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-5 border rounded-xl shadow-sm space-y-3">
+                            <h4 class="font-bold text-sm text-gray-700 border-b pb-1"><i class="fa-solid fa-hand-holding-dollar text-blue-600"></i> Setup Initial Capital</h4>
+                            <div class="flex gap-2">
+                                <input type="number" id="act-capital" class="border px-3 py-2 rounded-lg text-sm w-full" placeholder="Enter starting capital">
+                                <button onclick="setSystemCapital()" class="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg font-semibold">Set</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 border rounded-xl shadow-sm space-y-3">
+                            <h4 class="font-bold text-sm text-gray-700 border-b pb-1"><i class="fa-solid fa-building-columns text-purple-600"></i> Bank Transactions Log</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="act-bank-amt" class="border px-2 py-1.5 rounded-lg text-sm col-span-2" placeholder="Amount (৳)">
+                                <button onclick="executeBankTx('deposit')" class="bg-gray-800 text-white p-1.5 text-xs rounded-lg font-semibold hover:bg-black">Deposit (+)</button>
+                                <button onclick="executeBankTx('withdraw')" class="bg-purple-600 text-white p-1.5 text-xs rounded-lg font-semibold hover:bg-purple-700">Withdraw (-)</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 border rounded-xl shadow-sm space-y-3">
+                            <h4 class="font-bold text-sm text-gray-700 border-b pb-1"><i class="fa-solid fa-rotate-left text-red-500"></i> Invoice Sales Return Return</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="act-ret-inv" class="border px-2 py-1.5 rounded-lg text-sm" placeholder="Invoice ID">
+                                <input type="number" id="act-ret-amt" class="border px-2 py-1.5 rounded-lg text-sm" placeholder="Amount (৳)">
+                                <button onclick="postSalesReturn()" class="col-span-2 bg-red-600 text-white py-1.5 text-xs rounded-lg font-bold hover:bg-red-700">Deduct Return From Total Sales</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 border rounded-xl shadow-sm space-y-4">
+                        <h3 class="font-bold text-gray-900 border-b pb-2 text-base"><i class="fa-solid fa-wallet text-red-600"></i> Operation Expenses Registers</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <h5 class="text-xs font-bold uppercase tracking-wider text-gray-500">Delivery Man Salary Adjust</h5>
+                                <input type="text" id="exp-dm-name" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Delivery Man Name">
+                                <input type="number" id="exp-dm-deduct" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Deductions (Leave/Misc) ৳">
+                                <button onclick="postDMExpense()" class="w-full bg-gray-700 text-white py-1.5 text-xs rounded font-medium">Post Salary Expense</button>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <h5 class="text-xs font-bold uppercase tracking-wider text-gray-500">Space / Shop Rent Module</h5>
+                                <input type="number" id="exp-rent-base" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Base Monthly Rent ৳">
+                                <input type="number" id="exp-rent-retail" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Retail Adjust Minus ৳">
+                                <button onclick="postRentExpense()" class="w-full bg-gray-700 text-white py-1.5 text-xs rounded font-medium">Post Adjusted Rent</button>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <h5 class="text-xs font-bold uppercase tracking-wider text-gray-500">Current Bill & Utility / Misc</h5>
+                                <input type="text" id="exp-misc-name" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Expense Name (e.g. Electricity)">
+                                <input type="number" id="exp-misc-amt" class="w-full border px-2 py-1.5 rounded text-xs" placeholder="Amount ৳">
+                                <button onclick="postMiscExpense()" class="w-full bg-gray-700 text-white py-1.5 text-xs rounded font-medium">Post Utility Expense</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="printSection('accounts-statement-sheet')" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-700 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Download / Print Master Financial Profit Loss Sheet</button>
+                    </div>
+
+                    <div id="accounts-statement-sheet" class="bg-white p-8 border rounded-2xl shadow-sm space-y-6">
+                        <h3 class="text-center font-bold text-xl text-gray-900 border-b pb-3 tracking-wide">Net Commercial Accounting Balance Sheet</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 text-sm">
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>1. Initial Configured Capital:</span> <span class="font-bold text-gray-900" id="sheet-capital">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>2. Current Stocks Valuation (TP Total):</span> <span class="font-bold text-blue-600" id="sheet-valuation">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>3. Net Liquid Cash On Hand Balance:</span> <span class="font-bold text-emerald-600" id="sheet-cash">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>4. Bank Ledger Total Balance:</span> <span class="font-bold text-purple-600" id="sheet-bank">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>5. Gross Revenue From Invoices:</span> <span class="font-bold text-gray-900" id="sheet-sales">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600"><span>6. Total Active Outstanding Customer Dues:</span> <span class="font-bold text-orange-600" id="sheet-dues">৳0.00</span></div>
+                            <div class="flex justify-between border-b py-1.5 text-gray-600 col-span-1 md:col-span-2"><span>7. Total Posted Operating Expenses + Returns Deductions:</span> <span class="font-bold text-red-600" id="sheet-expenses">৳0.00</span></div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-xl border border-gray-200 text-center space-y-1">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider">End of Month Net Profit / Loss Financial Analysis Report</h4>
+                            <div class="text-2xl font-black" id="sheet-profit-loss">৳0.00</div>
+                            <p class="text-xs text-gray-400">Calculated based on Assets worth + Cash Liquidity minus invested capital and active expenses.</p>
+                        </div>
+
+                        <div class="space-y-3 pt-4">
+                            <h4 class="font-bold text-sm text-gray-800 uppercase tracking-wide"><i class="fa-solid fa-receipt text-indigo-600"></i> Invoice Automated Audit Trails & Logs</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs text-left border">
+                                    <thead class="bg-gray-100 font-bold text-gray-600 uppercase">
+                                        <tr>
+                                            <th class="p-2.5">Invoice #</th>
+                                            <th class="p-2.5">Shop Name</th>
+                                            <th class="p-2.5">Date Stamp</th>
+                                            <th class="p-2.5 text-right">Invoice Amount</th>
+                                            <th class="p-2.5 text-right">Received Cash</th>
+                                            <th class="p-2.5 text-right">Remaining Due</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sheet-invoices-log-body" class="divide-y">
+                                        <tr><td colspan="6" class="p-3 text-center text-gray-400">No transactions recorded yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="invoice-list-tab" class="tab-content space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Invoices Statement Archive</h2>
+                            <p class="text-gray-500 text-sm">তৈরি হওয়া সকল ইনভয়েস নাম্বারের পুরো লিস্ট ডাউনলোড বা ডিলিট করুন</p>
+                        </div>
+                        <button onclick="downloadInvoiceListCSV()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Download Invoice Numbers List</button>
+                    </div>
+
+                    <div class="bg-white border rounded-xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 border-b text-xs font-semibold uppercase text-gray-500">
+                                <tr>
+                                    <th class="p-4">Invoice Number</th>
+                                    <th class="p-4">Client Shop Name</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4">Items Count</th>
+                                    <th class="p-4 text-right">Total Payable</th>
+                                    <th class="p-4 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-archive-body" class="divide-y text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="settings-tab" class="tab-content space-y-6 hidden">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Account Profile Settings</h2>
+                        <p class="text-gray-500 text-sm">আপনার ডিলারশিপের নাম, লোগো এবং ঠিকানা এডিট করুন</p>
+                    </div>
+
+                    <div class="bg-white p-6 border rounded-xl shadow-sm max-w-xl">
+                        <form onsubmit="saveAccountSettings(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Business Name</label>
+                                <input type="text" id="set-bizname" required class="w-full px-4 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Phone Contact</label>
+                                <input type="tel" id="set-phone" required class="w-full px-4 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Shop Address <span class="text-red-500">(Mandatory)</span></label>
+                                <textarea id="set-address" required class="w-full px-4 py-2 border rounded-lg h-24"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Update Logo Image</label>
+                                <input type="file" id="set-logo" accept="image/*" class="w-full text-sm text-gray-500">
+                            </div>
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Save Modified Configurations</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="print-area" class="hidden"></div>
+
+    <div id="download-toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition duration-300 z-50">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <div>
+            <p class="font-semibold text-sm">Successfully Downloaded!</p>
+            <p class="text-xs text-emerald-100" id="toast-filename">document.csv</p>
+        </div>
     </div>
 
     <script>
+        let sessionUser = JSON.parse(localStorage.getItem('dms_user')) || null;
+        let inventory = JSON.parse(localStorage.getItem('dms_inventory')) || [
+            { sku: "SKU-101", company: "Square Consumer", name: "Ruchi Chanachur", qty: 250, dp: 40, tp: 42, mrp: 50, offer: "Buy 10 Get 1", gift: "Plastic Mug" },
+            { sku: "SKU-202", company: "Pran Foods", name: "Pran Spice Powder 100g", qty: 500, dp: 32, tp: 35, mrp: 40, offer: "None", gift: "None" }
+        ];
+        let invoices = JSON.parse(localStorage.getItem('dms_invoices')) || [];
+        
+        // Extended Accounting & DO Data Schema States
+        let doBook = JSON.parse(localStorage.getItem('dms_dobook')) || [];
+        let finance = JSON.parse(localStorage.getItem('dms_finance')) || {
+            capital: 0,
+            bank: 0,
+            cash: 0,
+            expenses: [] // objects: {name, val, date}
+        };
+
+        let currentOrderCart = [];
+        let activeInvoice = null;
+
+        window.onload = function() {
+            document.getElementById('order-date').valueAsDate = new Date();
+            if (sessionUser) {
+                renderDashboardState();
+            }
+        };
+
+        function switchAuth(target) {
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('signup-card').classList.add('hidden');
+            document.getElementById('forgot-card').classList.add('hidden');
+            document.getElementById(`${target}-card`).classList.remove('hidden');
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const bizName = document.getElementById('reg-bizname').value.trim();
+            const phone = document.getElementById('reg-phone').value;
+            const address = document.getElementById('reg-address').value.trim();
+            const logoFile = document.getElementById('reg-logo').files[0];
+
+            const saveUserData = (logoDataUrl) => {
+                sessionUser = { username, password, bizName, phone, address, logo: logoDataUrl || '' };
+                localStorage.setItem('dms_user', JSON.stringify(sessionUser));
+                alert('Sign up successful! Please log in.');
+                switchAuth('login');
+            };
+
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(event) { saveUserData(event.target.result); };
+                reader.readAsDataURL(logoFile);
+            } else {
+                saveUserData('');
+            }
+        }
+
         function handleLogin(e) {
             e.preventDefault();
-            const localData = JSON.parse(localStorage.getItem('dealer_account'));
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value;
 
-            if(localData && localData.username === u && localData.password === p) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                window.location.href = 'dashboard.html';
+            if (sessionUser && sessionUser.username === u && sessionUser.password === p) {
+                renderDashboardState();
             } else {
                 alert('Invalid Username or Password!');
             }
+        }
+
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const inputUsername = document.getElementById('forgot-username').value.trim();
+            if (sessionUser && sessionUser.username === inputUsername) {
+                alert(`Account Found!\nYour Password is: ${sessionUser.password}`);
+                switchAuth('login');
+            } else {
+                alert('No registered user found!');
+            }
+        }
+
+        function renderDashboardState() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            
+            document.getElementById('sidebar-name').innerText = sessionUser.bizName;
+            if(sessionUser.logo) document.getElementById('sidebar-logo').src = sessionUser.logo;
+
+            document.getElementById('set-bizname').value = sessionUser.bizName;
+            document.getElementById('set-phone').value = sessionUser.phone;
+            document.getElementById('set-address').value = sessionUser.address;
+
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-date-time').innerText = now.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            }, 1000);
+
+            refreshInventoryDOM();
+            refreshOrderDropdownDOM();
+            refreshInvoiceArchiveDOM();
+            refreshDOBookDOM();
+            recalculateAndRenderAccounting();
+        }
+
+        function saveAccountSettings(e) {
+            e.preventDefault();
+            sessionUser.bizName = document.getElementById('set-bizname').value.trim();
+            sessionUser.phone = document.getElementById('set-phone').value;
+            sessionUser.address = document.getElementById('set-address').value.trim();
+
+            const file = document.getElementById('set-logo').files[0];
+            const save = () => {
+                localStorage.setItem('dms_user', JSON.stringify(sessionUser));
+                document.getElementById('sidebar-name').innerText = sessionUser.bizName;
+                if(sessionUser.logo) document.getElementById('sidebar-logo').src = sessionUser.logo;
+                alert('Settings updated successfully!');
+            };
+
+            if(file) {
+                const r = new FileReader();
+                r.onload = function(ev) { sessionUser.logo = ev.target.result; save(); };
+                r.readAsDataURL(file);
+            } else {
+                save();
+            }
+        }
+
+        // ================= INVENTORY METHODS =================
+        function saveProduct(e) {
+            e.preventDefault();
+            const index = document.getElementById('edit-index').value;
+            const p = {
+                sku: document.getElementById('inv-sku').value.trim(),
+                company: document.getElementById('inv-comp').value.trim(),
+                name: document.getElementById('inv-name').value.trim(),
+                qty: parseInt(document.getElementById('inv-qty').value),
+                dp: parseFloat(document.getElementById('inv-dp').value),
+                tp: parseFloat(document.getElementById('inv-tp').value),
+                mrp: parseFloat(document.getElementById('inv-mrp').value),
+                offer: document.getElementById('inv-offer').value || 'None',
+                gift: document.getElementById('inv-gift').value || 'None'
+            };
+
+            if(index === "") {
+                inventory.push(p);
+            } else {
+                inventory[index] = p;
+                resetInventoryForm();
+            }
+
+            localStorage.setItem('dms_inventory', JSON.stringify(inventory));
+            refreshInventoryDOM();
+            refreshOrderDropdownDOM();
+            recalculateAndRenderAccounting();
+            document.getElementById('product-form').reset();
+        }
+
+        function editInventoryItem(idx) {
+            const p = inventory[idx];
+            document.getElementById('edit-index').value = idx;
+            document.getElementById('inv-sku').value = p.sku;
+            document.getElementById('inv-comp').value = p.company;
+            document.getElementById('inv-name').value = p.name;
+            document.getElementById('inv-qty').value = p.qty;
+            document.getElementById('inv-dp').value = p.dp;
+            document.getElementById('inv-tp').value = p.tp;
+            document.getElementById('inv-mrp').value = p.mrp;
+            document.getElementById('inv-offer').value = p.offer === 'None' ? '' : p.offer;
+            document.getElementById('inv-gift').value = p.gift === 'None' ? '' : p.gift;
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> প্রোডাক্টের তথ্য সংশোধন করুন (Editing)`;
+            document.getElementById('btn-form-submit').innerText = "Update Product Info";
+            document.getElementById('btn-form-submit').classList.replace('bg-blue-600', 'bg-amber-600');
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+        }
+
+        function deleteInventoryItem(idx) {
+            if(confirm('Are you sure you want to completely delete this product from stock?')) {
+                inventory.splice(idx, 1);
+                localStorage.setItem('dms_inventory', JSON.stringify(inventory));
+                refreshInventoryDOM();
+                refreshOrderDropdownDOM();
+                recalculateAndRenderAccounting();
+            }
+        }
+
+        function resetInventoryForm() {
+            document.getElementById('edit-index').value = "";
+            document.getElementById('product-form').reset();
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-plus-circle text-blue-600"></i> নতুন প্রোডাক্ট যোগ করুন`;
+            document.getElementById('btn-form-submit').innerText = "Add To Inventory Stock";
+            document.getElementById('btn-form-submit').classList.replace('bg-amber-600', 'bg-blue-600');
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+
+        function refreshInventoryDOM() {
+            const body = document.getElementById('inventory-table-body');
+            body.innerHTML = inventory.map((p, idx) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 font-mono font-semibold">${p.sku}</td>
+                    <td class="p-3">${p.company}</td>
+                    <td class="p-3 font-medium">${p.name}</td>
+                    <td class="p-3 font-bold text-blue-600">${p.qty}</td>
+                    <td class="p-3">৳${p.dp}</td>
+                    <td class="p-3">৳${p.tp}</td>
+                    <td class="p-3">৳${p.mrp}</td>
+                    <td class="p-3 text-xs text-gray-500">${p.offer} / ${p.gift}</td>
+                    <td class="p-3 text-center flex justify-center gap-1 no-print">
+                        <button onclick="editInventoryItem(${idx})" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 transition text-xs"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteInventoryItem(${idx})" class="bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= ORDERING FLOWS =================
+        function refreshOrderDropdownDOM() {
+            const select = document.getElementById('order-product-select');
+            select.innerHTML = inventory.map((p, idx) => `<option value="${idx}">[${p.sku}] ${p.name} (Stock: ${p.qty})</option>`).join('');
+        }
+
+        function addItemToCurrentOrder() {
+            const idx = document.getElementById('order-product-select').value;
+            const orderQty = parseInt(document.getElementById('order-qty').value);
+            
+            if(idx === "" || !inventory[idx]) return alert('No valid product selected!');
+            const targetProduct = inventory[idx];
+
+            if(orderQty > targetProduct.qty) {
+                return alert(`Insufficient Stock! Only ${targetProduct.qty} units available.`);
+            }
+
+            const existingCartItem = currentOrderCart.find(item => item.invIndex == idx);
+            if(existingCartItem) {
+                if((existingCartItem.qty + orderQty) > targetProduct.qty) {
+                    return alert(`Cannot add! Total requested quantity exceeds available stock.`);
+                }
+                existingCartItem.qty += orderQty;
+                existingCartItem.subtotal = existingCartItem.qty * existingCartItem.tp;
+            } else {
+                currentOrderCart.push({
+                    invIndex: idx,
+                    sku: targetProduct.sku,
+                    name: targetProduct.name,
+                    qty: orderQty,
+                    tp: targetProduct.tp,
+                    mrp: targetProduct.mrp,
+                    subtotal: targetProduct.tp * orderQty,
+                    offer: targetProduct.offer,
+                    gift: targetProduct.gift
+                });
+            }
+            refreshCartDOM();
+        }
+
+        function removeCartItem(cartIdx) {
+            currentOrderCart.splice(cartIdx, 1);
+            refreshCartDOM();
+        }
+
+        function refreshCartDOM() {
+            const body = document.getElementById('cart-table-body');
+            if(currentOrderCart.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">কোনো আইটেম যোগ করা হয়নি। বামদিকের বাটন থেকে এড করুন।</td></tr>`;
+                return;
+            }
+            body.innerHTML = currentOrderCart.map((item, idx) => `
+                <tr class="text-gray-700">
+                    <td class="p-2 font-medium">${item.name}</td>
+                    <td class="p-2 text-center font-bold">${item.qty}</td>
+                    <td class="p-2 text-right">৳${item.tp}</td>
+                    <td class="p-2 text-right font-semibold">৳${item.subtotal}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="removeCartItem(${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark-circle"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function processOrderCheckout() {
+            if(currentOrderCart.length === 0) {
+                return alert('Your active cart order is empty! Add at least one item first.');
+            }
+
+            let receivedCash = parseFloat(document.getElementById('order-cash-received').value) || 0;
+
+            // Deduct Stocks
+            currentOrderCart.forEach(cartItem => {
+                inventory[cartItem.invIndex].qty -= cartItem.qty;
+            });
+
+            localStorage.setItem('dms_inventory', JSON.stringify(inventory));
+            refreshInventoryDOM();
+            refreshOrderDropdownDOM();
+
+            const invId = "INV-" + Math.floor(100000 + Math.random() * 900000);
+            const totalInvoiceSum = currentOrderCart.reduce((acc, current) => acc + current.subtotal, 0);
+            let totalDue = totalInvoiceSum - receivedCash;
+
+            activeInvoice = {
+                id: invId,
+                shop: document.getElementById('order-shop-name').value,
+                targetAddress: document.getElementById('order-shop-address').value,
+                date: document.getElementById('order-date').value,
+                items: [...currentOrderCart],
+                total: totalInvoiceSum,
+                received: receivedCash,
+                due: totalDue
+            };
+
+            invoices.push(activeInvoice);
+            localStorage.setItem('dms_invoices', JSON.stringify(invoices));
+            refreshInvoiceArchiveDOM();
+
+            // Financial Update On Hand
+            finance.cash += receivedCash;
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+
+            // Render Preview Panel
+            if(sessionUser.logo) {
+                document.getElementById('inv-preview-logo').src = sessionUser.logo;
+                document.getElementById('inv-preview-logo').classList.remove('hidden');
+            }
+            document.getElementById('inv-preview-bizname').innerText = sessionUser.bizName;
+            document.getElementById('inv-preview-address').innerText = sessionUser.address;
+            document.getElementById('inv-preview-phone').innerText = "Phone: " + sessionUser.phone;
+            
+            document.getElementById('inv-preview-id').innerText = `Invoice No: #${activeInvoice.id}`;
+            document.getElementById('inv-preview-date').innerText = `Date: ${activeInvoice.date}`;
+            document.getElementById('inv-preview-target-shop').innerText = activeInvoice.shop;
+            document.getElementById('inv-preview-target-address').innerText = activeInvoice.targetAddress;
+
+            document.getElementById('inv-items-body').innerHTML = activeInvoice.items.map(item => `
+                <tr>
+                    <td class="p-3">
+                        <span class="font-mono font-bold block text-xs text-gray-400">${item.sku}</span>
+                        <span class="font-medium">${item.name}</span>
+                        ${item.offer !== 'None' || item.gift !== 'None' ? `<span class="block text-xs text-blue-600">Promo: ${item.offer} | Gift: ${item.gift}</span>` : ''}
+                    </td>
+                    <td class="p-3 text-center font-bold">${item.qty}</td>
+                    <td class="p-3 text-right">৳${item.tp}</td>
+                    <td class="p-3 text-right">৳${item.mrp}</td>
+                    <td class="p-3 text-right font-semibold text-gray-900">৳${item.subtotal.toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('inv-subtotal-val').innerText = `৳${activeInvoice.total.toLocaleString()}`;
+            document.getElementById('inv-received-val').innerText = `৳${activeInvoice.received.toLocaleString()}`;
+            document.getElementById('inv-total-amount').innerText = `৳${activeInvoice.due.toLocaleString()}`;
+            
+            currentOrderCart = [];
+            document.getElementById('order-cash-received').value = 0;
+            refreshCartDOM();
+            recalculateAndRenderAccounting();
+            alert(`Order checkout completed! Single invoice generated successfully.`);
+        }
+
+        // ================= PRODUCT DELIVERY ORDER (DO) METHODS =================
+        function saveDOEntry(e) {
+            e.preventDefault();
+            const newDO = {
+                date: new Date().toLocaleDateString('en-US'),
+                name: document.getElementById('do-pname').value.trim(),
+                unit: document.getElementById('do-punit').value.trim(),
+                qty: parseInt(document.getElementById('do-pqty').value),
+                amount: parseFloat(document.getElementById('do-pamount').value)
+            };
+            doBook.push(newDO);
+            localStorage.setItem('dms_dobook', JSON.stringify(doBook));
+            document.getElementById('do-form').reset();
+            refreshDOBookDOM();
+            alert('DO Entry saved successfully to ledger!');
+        }
+
+        function refreshDOBookDOM() {
+            const body = document.getElementById('do-table-body');
+            if(doBook.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No active Delivery Orders logged yet.</td></tr>`;
+                return;
+            }
+            body.innerHTML = doBook.map(d => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 text-gray-500">${d.date}</td>
+                    <td class="p-3 font-semibold text-gray-900">${d.name}</td>
+                    <td class="p-3">${d.unit}</td>
+                    <td class="p-3 text-center font-bold">${d.qty}</td>
+                    <td class="p-3 text-right font-semibold text-indigo-600">৳${d.amount.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function downloadDOCSV() {
+            let csv = 'Date Stamp,Product Name,Unit Metric,DO Quantity,Total Order Cost BDT\n';
+            doBook.forEach(d => { csv += `"${d.date}","${d.name}","${d.unit}",${d.qty},${d.amount}\n`; });
+            triggerFileDownload(csv, `Delivery_Orders_Book_Log.csv`);
+        }
+
+        // ================= FINANCIAL MECHANICS ENGINE =================
+        function setSystemCapital() {
+            const val = parseFloat(document.getElementById('act-capital').value) || 0;
+            finance.capital = val;
+            finance.cash = val; // Capital initially feeds into liquid cash on hand
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert(`Initial capital set to: ৳${val}`);
+        }
+
+        function executeBankTx(type) {
+            const amt = parseFloat(document.getElementById('act-bank-amt').value) || 0;
+            if(amt <= 0) return alert('Enter valid currency values!');
+
+            if(type === 'deposit') {
+                if(amt > finance.cash) return alert('Insufficient cash on hand to complete bank deposit!');
+                finance.cash -= amt;
+                finance.bank += amt;
+            } else {
+                if(amt > finance.bank) return alert('Insufficient balance inside bank ledger to execute withdrawal!');
+                finance.bank -= amt;
+                finance.cash += amt;
+            }
+            document.getElementById('act-bank-amt').value = '';
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert(`Bank transaction processed successfully!`);
+        }
+
+        function postSalesReturn() {
+            const invId = document.getElementById('act-ret-inv').value.trim();
+            const amt = parseFloat(document.getElementById('act-ret-amt').value) || 0;
+            if(invId === '' || amt <= 0) return alert('Please input valid context values!');
+
+            finance.expenses.push({
+                name: `Sales Return Adjustment [Invoice ID: #${invId}]`,
+                val: amt,
+                date: new Date().toLocaleDateString('en-US')
+            });
+            finance.cash -= amt; // Deduct from the net liquid cash assets pool
+
+            document.getElementById('act-ret-inv').value = '';
+            document.getElementById('act-ret-amt').value = '';
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert(`Sales return posted successfully! ৳${amt} deducted from total computations.`);
+        }
+
+        function postDMExpense() {
+            const name = document.getElementById('exp-dm-name').value.trim();
+            const deduct = parseFloat(document.getElementById('exp-dm-deduct').value) || 0;
+            if(name === "") return alert('Enter Delivery Man reference details!');
+            
+            let baseSalary = 15000; // Base baseline structural configuration placeholder
+            let netPayout = baseSalary - deduct;
+
+            finance.expenses.push({
+                name: `Delivery Man Payout: ${name} (Base: ${baseSalary} - Absences Deduction: ${deduct})`,
+                val: netPayout,
+                date: new Date().toLocaleDateString('en-US')
+            });
+            finance.cash -= netPayout;
+            
+            document.getElementById('exp-dm-name').value = '';
+            document.getElementById('exp-dm-deduct').value = '';
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert('Delivery man salary expense registered!');
+        }
+
+        function postRentExpense() {
+            const base = parseFloat(document.getElementById('exp-rent-base').value) || 0;
+            const retail = parseFloat(document.getElementById('exp-rent-retail').value) || 0;
+            if(base <= 0) return alert('Enter valid base rent amount!');
+
+            let finalRentExp = base - retail;
+            finance.expenses.push({
+                name: `Space Rent (Base: ${base} minus Retail/Sublet Adjustment: ${retail})`,
+                val: finalRentExp,
+                date: new Date().toLocaleDateString('en-US')
+            });
+            finance.cash -= finalRentExp;
+
+            document.getElementById('exp-rent-base').value = '';
+            document.getElementById('exp-rent-retail').value = '';
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert('Adjusted space/shop rent registered!');
+        }
+
+        function postMiscExpense() {
+            const typeName = document.getElementById('exp-misc-name').value.trim();
+            const amount = parseFloat(document.getElementById('exp-misc-amt').value) || 0;
+            if(typeName === "" || amount <= 0) return alert('Fill required misc utility descriptors!');
+
+            finance.expenses.push({
+                name: `Utility/Misc: ${typeName}`,
+                val: amount,
+                date: new Date().toLocaleDateString('en-US')
+            });
+            finance.cash -= amount;
+
+            document.getElementById('exp-misc-name').value = '';
+            document.getElementById('exp-misc-amt').value = '';
+            localStorage.setItem('dms_finance', JSON.stringify(finance));
+            recalculateAndRenderAccounting();
+            alert('Utility/Misc operational expense posted!');
+        }
+
+        function recalculateAndRenderAccounting() {
+            // 1. Current Valuation calculations based on trade prices (TP)
+            let totalStockValuation = inventory.reduce((acc, p) => acc + (p.qty * p.tp), 0);
+            
+            // 2. Invoice analytics loop totals
+            let totalInvoiceSalesVolume = invoices.reduce((acc, i) => acc + i.total, 0);
+            let totalActiveOutstandingCustomerDues = invoices.reduce((acc, i) => acc + i.due, 0);
+
+            // 3. Operational Expenses sums
+            let totalExpensesAccumulated = finance.expenses.reduce((acc, e) => acc + e.val, 0);
+
+            // Bind values to UI Sheet
+            document.getElementById('sheet-capital').innerText = `৳${finance.capital.toLocaleString()}`;
+            document.getElementById('sheet-valuation').innerText = `৳${totalStockValuation.toLocaleString()}`;
+            document.getElementById('sheet-cash').innerText = `৳${finance.cash.toLocaleString()}`;
+            document.getElementById('sheet-bank').innerText = `৳${finance.bank.toLocaleString()}`;
+            document.getElementById('sheet-sales').innerText = `৳${totalInvoiceSalesVolume.toLocaleString()}`;
+            document.getElementById('sheet-dues').innerText = `৳${totalActiveOutstandingCustomerDues.toLocaleString()}`;
+            document.getElementById('sheet-expenses').innerText = `৳${totalExpensesAccumulated.toLocaleString()}`;
+
+            // 4. NET PROFIT/LOSS EQUATION: Current Asset Portfolio Value vs Initial Invested Capital Base
+            let netWorthValueNow = (finance.cash + finance.bank + totalStockValuation + totalActiveOutstandingCustomerDues);
+            let endNetCommercialBalance = netWorthValueNow - finance.capital;
+
+            const profitBox = document.getElementById('sheet-profit-loss');
+            profitBox.innerText = `৳${endNetCommercialBalance.toLocaleString()}`;
+            if(endNetCommercialBalance >= 0) {
+                profitBox.className = "text-2xl font-black text-green-600";
+            } else {
+                profitBox.className = "text-2xl font-black text-red-600";
+            }
+
+            // Sync Table Invoices log inside accounting interface tab view
+            const bodyLog = document.getElementById('sheet-invoices-log-body');
+            if(invoices.length === 0) {
+                bodyLog.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No transactions audited yet.</td></tr>`;
+                return;
+            }
+            bodyLog.innerHTML = invoices.map(i => `
+                <tr class="text-gray-700">
+                    <td class="p-2 font-mono font-bold">#${i.id}</td>
+                    <td class="p-2 font-medium">${i.shop}</td>
+                    <td class="p-2 text-gray-400">${i.date}</td>
+                    <td class="p-2 text-right">৳${i.total.toLocaleString()}</td>
+                    <td class="p-2 text-right text-green-600">৳${i.received.toLocaleString()}</td>
+                    <td class="p-2 text-right text-red-600 font-bold">৳${i.due.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= INVOICE ARCHIVE MANAGEMENT =================
+        function deleteInvoice(idx) {
+            if(confirm('Are you sure you want to permanently delete this invoice record?')) {
+                // Return money back from the liquid calculations state if deleted
+                finance.cash -= invoices[idx].received;
+                invoices.splice(idx, 1);
+                localStorage.setItem('dms_invoices', JSON.stringify(invoices));
+                localStorage.setItem('dms_finance', JSON.stringify(finance));
+                refreshInvoiceArchiveDOM();
+                recalculateAndRenderAccounting();
+            }
+        }
+
+        function refreshInvoiceArchiveDOM() {
+            const body = document.getElementById('invoice-archive-body');
+            if(invoices.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No invoices archived yet.</td></tr>`;
+                return;
+            }
+            body.innerHTML = invoices.map((i, idx) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-mono font-bold text-gray-900">#${i.id}</td>
+                    <td class="p-4 font-medium">${i.shop}</td>
+                    <td class="p-4 text-gray-500">${i.date}</td>
+                    <td class="p-4 text-center font-semibold text-indigo-600">${i.items ? i.items.length : 1} Items</td>
+                    <td class="p-4 text-right font-bold text-gray-900">৳${i.total.toLocaleString()}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteInvoice(${idx})" class="bg-red-100 text-red-700 px-2.5 py-1 rounded-lg hover:bg-red-200 transition text-xs font-medium"><i class="fa-solid fa-trash-can mr-1"></i> Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= COMPONENT STATEMENT DOWNLOAD EXPORTS SYSTEM =================
+        function downloadInventoryCSV() {
+            let csv = 'SKU,Company,Product Name,Stock Quantity,Dealer Price,TP,MRP,Offer,Gift\n';
+            inventory.forEach(p => { csv += `"${p.sku}","${p.company}","${p.name}",${p.qty},${p.dp},${p.tp},${p.mrp},"${p.offer}","${p.gift}"\n`; });
+            triggerFileDownload(csv, 'Inventory_SKU_Stock_Report.csv');
+        }
+
+        function downloadInvoiceListCSV() {
+            let csv = 'Invoice Number,Client Shop Name,Billing Date,Invoice Total,Amount Paid,Amount Due\n';
+            invoices.forEach(i => { csv += `#${i.id},"${i.shop}",${i.date},${i.total},${i.received},${i.due}\n`; });
+            triggerFileDownload(csv, 'All_Generated_Invoices_List.csv');
+        }
+
+        function triggerInvoiceDownload() {
+            if(!activeInvoice) return alert('No active order generated yet!');
+            let csv = `Invoice ID,#${activeInvoice.id}\nDate,${activeInvoice.date}\nBusiness Header,${sessionUser.bizName}\nClient Shop,${activeInvoice.shop}\n\nSKU,Item Name,Qty,TP Rate,Subtotal\n`;
+            activeInvoice.items.forEach(item => { csv += `${item.sku},"${item.name}",${item.qty},${item.tp},${item.subtotal}\n`; });
+            csv += `,,,Total Amount,৳${activeInvoice.total}\nCash Paid,৳${activeInvoice.received}\nOutstanding Due,৳${activeInvoice.due}\n`;
+            triggerFileDownload(csv, `Invoice_${activeInvoice.id}.csv`);
+        }
+
+        function triggerFileDownload(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            const toast = document.getElementById('download-toast');
+            document.getElementById('toast-filename').innerText = filename;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // ================= ADVANCED SEPARATE SECTION PRINT UTILITY =================
+        function printSection(elementId) {
+            const printElement = document.getElementById(elementId);
+            const printArea = document.getElementById('print-area');
+            
+            // Sync business info parameters into print headers if present
+            printArea.innerHTML = `
+                <div class="p-8 space-y-4">
+                    <div class="text-center border-b pb-4 mb-4">
+                        <h1 class="text-2xl font-bold">${sessionUser ? sessionUser.bizName : 'Dealer Portal'}</h1>
+                        <p class="text-sm text-gray-500">${sessionUser ? sessionUser.address : ''}</p>
+                        <p class="text-xs text-gray-400">System Report Stamp: ${new Date().toLocaleString()}</p>
+                    </div>
+                    ${printElement.innerHTML}
+                </div>
+            `;
+            
+            // Trigger operational print layout
+            window.print();
+            printArea.innerHTML = ''; // Clean up container state
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-blue-600', 'text-white');
+                b.classList.add('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+            });
+            
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+            }
+            if(tabId === 'accounts-tab') recalculateAndRenderAccounting();
+        }
+
+        function logout() {
+            document.getElementById('main-dashboard').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
         }
     </script>
 </body>
